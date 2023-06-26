@@ -15,7 +15,7 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
     _id: order.cow,
     label: { $ne: "sold out" },
   }).orFail(
-    new ApiError(httpStatus.NOT_FOUND, "Cow not found or has been sold")
+    new ApiError(httpStatus.NOT_FOUND, "Cow not found or Cow has been Sold")
   );
 
   // buyer has enough money
@@ -69,6 +69,12 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
   }
 };
 
+const getAllOrders = async (): Promise<IOrder[] | null> => {
+  const orders = await Order.find();
+  return orders;
+};
+
 export const OrderService = {
   createOrder,
+  getAllOrders,
 };
