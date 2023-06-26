@@ -36,7 +36,7 @@
 <br>
 
 <h2 align="center">
-    Examples
+    Using Examples
 </h2>
 
 ### Users :
@@ -127,7 +127,9 @@ Example Body :
 
 **Get All Cows : `(GET)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows`
+```
+https://digi-cow-hut.vercel.app/api/v1/cows
+```
 
 Pagination | Filtering | Search | Sort :
 
