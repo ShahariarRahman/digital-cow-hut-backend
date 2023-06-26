@@ -79,7 +79,9 @@ const getAllCows = async (
 };
 
 const getSingleCow = async (id: string): Promise<ICow | null> => {
-  const result = await Cow.findById(id).populate("seller");
+  const result = await Cow.findById(id)
+    .populate("seller")
+    .orFail(new ApiError(httpStatus.NOT_FOUND, "Cow not found"));
   return result;
 };
 
@@ -87,21 +89,27 @@ const updateCow = async (
   id: string,
   payload: Partial<ICow>
 ): Promise<ICow | null> => {
-  const isExist = await Cow.findById(id);
+  await Cow.findById(id).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Cow not found")
+  );
 
-  if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Cow not found !");
+  if (Object.keys(payload).length < 1) {
+    throw new Error("No data found to update");
   }
 
   const result = await Cow.findOneAndUpdate({ _id: id }, payload, {
     new: true,
-  }).populate("seller");
+  })
+    .populate("seller")
+    .orFail(new ApiError(httpStatus.NOT_FOUND, "Failed to Update"));
 
   return result;
 };
 
 const deleteCow = async (id: string): Promise<ICow | null> => {
-  const result = await Cow.findByIdAndDelete(id);
+  const result = await Cow.findByIdAndDelete(id).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Failed to Delete")
+  );
   return result;
 };
 

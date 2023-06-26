@@ -1,6 +1,6 @@
-## Digital Cow Hut Backend:
+## Digital Cow Hut Backend :
 
-### Live Link: https://digi-cow-hut.vercel.app/api/v1
+#### Live Link: https://digi-cow-hut.vercel.app/api/v1
 
 ### Application Routes :
 
@@ -41,11 +41,13 @@
 
 ### Users :
 
-Create A Users : (POST)
+**Create A User : `(POST)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/signup`
+```
+https://digi-cow-hut.vercel.app/api/v1/signup
+```
 
-Body :
+Example Body :
 
 ```
 {
@@ -62,25 +64,31 @@ Body :
 }
 ```
 
-<small>Role : `seller | buyer`</small><br/> <small>Location : `Dhaka | Chattogram | Barishal | Rajshahi | Sylhet | Comilla | Rangpur | Mymensingh`</small>
+**Get All Users : `(GET)`**
 
-**Get All Users : (GET)**
+```
+https://digi-cow-hut.vercel.app/api/v1/users
+```
 
-`https://digi-cow-hut.vercel.app/api/v1/users`
+**Get Single User : `(GET)`**
 
-**Get Single User : (GET)**
+```
+https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d
+```
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
+**Delete A User : `(DELETE)`**
 
-**Delete A User : (DELETE)**
+```
+https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d
+```
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
+**Update A User : `(UPDATE)`**
 
-**Update A User : (UPDATE)**
+```
+https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d
+```
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
-
-Body :
+Example Body :
 
 ```
 {
@@ -95,9 +103,11 @@ Body :
 
 ### Cows :
 
-**Create A Cow : (POST)**
+**Create A Cow : `(POST)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows`
+```
+https://digi-cow-hut.vercel.app/api/v1/cows
+```
 
 Example Body :
 
@@ -115,26 +125,17 @@ Example Body :
 }
 ```
 
-<small>Location : `Dhaka | Chattogram | Barishal | Rajshahi | Sylhet | Comilla | Rangpur | Mymensingh`</small>
-
-<small>Breed : `Brahman | Nellore | Sahiwal | Gir | Indigenous | Tharparkar | Kankrej`</small><br/>
-
-<small>Label : `for sale | sold out`</small><br/>
-
-<small>Category : `Dairy | Beef | DualPurpose`</small><br/><br/>
-
-**Get All Cows : (GET)**
+**Get All Cows : `(GET)`**
 
 `https://digi-cow-hut.vercel.app/api/v1/cows`
 
-Pagination :
+Pagination | Filtering | Search | Sort :
 
 ```
-cows?searchTerm=Kankrej&page=1&limit=3&sortBy=price&sortOrder=asc&minPrice=60000&maxPrice=80000&location=Chattogram
 
 https://digi-cow-hut.vercel.app/api/v1/cows?page=1&limit=5
 
-https://digi-cow-hut.vercel.app/api/v1/cows?searchTerm=dai
+https://digi-cow-hut.vercel.app/api/v1/cows?searchTerm=Cha
 
 https://digi-cow-hut.vercel.app/api/v1/cows?sortBy=price&sortOrder=asc
 
@@ -142,19 +143,27 @@ https://digi-cow-hut.vercel.app/api/v1/cows?minPrice=60000&maxPrice=80000
 
 https://digi-cow-hut.vercel.app/api/v1/cows?location=Chattogram
 
+// all
+cows?searchTerm=Kankrej&page=1&limit=3&sortBy=price&sortOrder=asc&minPrice=60000&maxPrice=80000&location=Chattogram
 ```
 
-**Get Single Cow : (GET)**
+**Get Single Cow : `(GET)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
+```
+https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13
+```
 
-**Delete A Cow : (DELETE)**
+**Delete A Cow : `(DELETE)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
+```
+https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13
+```
 
-**Update A Cow : (UPDATE)**
+**Update A Cow : `(UPDATE)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
+```
+https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13
+```
 
 Example Body :
 
@@ -166,15 +175,15 @@ Example Body :
 }
 ```
 
-<!--  -->
-
 <h1></h1>
 
 ### Orders :
 
-**Create orders : (POST)**
+**Create orders : `(POST)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/orders`
+```
+https://digi-cow-hut.vercel.app/api/v1/orders
+```
 
 Example Body :
 
@@ -185,6 +194,8 @@ Example Body :
 }
 ```
 
-**Get All Orders : (GET)**
+**Get All Orders : `(GET)`**
 
-`https://digi-cow-hut.vercel.app/api/v1/orders`
+```
+https://digi-cow-hut.vercel.app/api/v1/orders
+```

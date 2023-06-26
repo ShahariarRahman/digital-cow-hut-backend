@@ -69,7 +69,7 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
 };
 
 const getAllOrders = async (): Promise<IOrder[] | null> => {
-  const orders = await Order.find();
+  const orders = await Order.find().populate("cow").populate("buyer");
   if (!orders) {
     throw new ApiError(httpStatus.NOT_FOUND, "Failed to retrieve Orders");
   }

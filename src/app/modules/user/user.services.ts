@@ -5,12 +5,16 @@ import { IUser } from "./user.interface";
 import { User } from "./user.model";
 
 const getAllUsers = async (): Promise<IUser[]> => {
-  const users = await User.find({});
+  const users = await User.find({}).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Users Not Found")
+  );
   return users;
 };
 
 const getSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findById(id);
+  const result = await User.findById(id).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "User Not Found")
+  );
   return result;
 };
 
@@ -18,10 +22,12 @@ const updateUser = async (
   id: string,
   payload: Partial<IUser>
 ): Promise<IUser | null> => {
-  const isExist = await User.findById(id);
+  await User.findById(id).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "User not found !")
+  );
 
-  if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found !");
+  if (Object.keys(payload).length < 1) {
+    throw new Error("No data found to update");
   }
 
   const { name, ...UserData } = payload;
@@ -41,7 +47,9 @@ const updateUser = async (
 };
 
 const deleteUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findByIdAndDelete(id);
+  const result = await User.findByIdAndDelete(id).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Failed to Delete User")
+  );
   return result;
 };
 
