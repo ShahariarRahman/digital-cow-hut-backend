@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 import app from "./app";
 import config from "./config/index";
-import { logger, errorLogger } from "./shared/logger";
+// import { logger, errorLogger } from "./shared/logger";
 import { Server } from "http";
 
 // sync task, outside app: Uncaught Exception
 process.on("uncaughtException", error => {
-  errorLogger.error(error); // error log
+  // errorLogger.error(error); // error log
+  console.log(error); // error log
   process.exit(1); // off server
 });
 
@@ -15,13 +16,16 @@ let server: Server;
 async function bootstrap() {
   try {
     await mongoose.connect(config.database_url as string);
-    logger.info("🛢 database connected successfully");
+    // logger.info("🛢 database connected successfully");
+    console.log("🛢 database connected successfully");
 
     server = app.listen(config.port, () => {
-      logger.info(`listening on port ${config.port}`);
+      // logger.info(`listening on port ${config.port}`);
+      console.log(`listening on port ${config.port}`);
     });
   } catch (err) {
-    errorLogger.error("Failed to connected database", err);
+    // errorLogger.error("Failed to connected database", err);
+    console.log("Failed to connected database", err);
   }
 
   // Gracefully off server: unhandled Rejection:(promise/async)
@@ -29,7 +33,8 @@ async function bootstrap() {
     if (server) {
       // if server running: server.close> log> process.exit
       server.close(() => {
-        errorLogger.error(error);
+        // errorLogger.error(error);
+        console.log(error);
         process.exit(1);
       });
     } else {
@@ -45,7 +50,8 @@ bootstrap();
 process.on("SIGTERM", () => {
   if (server) {
     server.close(() => {
-      logger.info("SIGTERM is received");
+      // logger.info("SIGTERM is received");
+      console.log("SIGTERM is received");
       process.exit(1);
     });
   } else {
