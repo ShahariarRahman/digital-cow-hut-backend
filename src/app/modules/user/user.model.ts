@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
 import { IUser, UserModel } from "./user.interface";
 import { userRole } from "./user.constant";
+import { location } from "../cow/cow.constants";
 
 const userSchema = new Schema<IUser>(
   {
@@ -31,6 +32,7 @@ const userSchema = new Schema<IUser>(
     address: {
       type: String,
       required: true,
+      enum: location,
     },
     budget: {
       type: Number,

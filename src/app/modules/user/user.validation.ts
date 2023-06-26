@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { userRole } from "./user.constant";
+import { location } from "../cow/cow.constants";
 
 const updateUserZodSchema = z.object({
   body: z.object({
@@ -12,7 +13,7 @@ const updateUserZodSchema = z.object({
         lastName: z.string().optional(),
       })
       .optional(),
-    address: z.string().optional(),
+    address: z.enum([...location] as [string, ...string[]]).optional(),
     budget: z.number().optional(),
     income: z.number().optional(),
   }),

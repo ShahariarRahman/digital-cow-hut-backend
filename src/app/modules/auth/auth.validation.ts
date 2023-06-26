@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { userRole } from "../user/user.constant";
+import { location } from "../cow/cow.constants";
 
 const userSignupZodSchema = z.object({
   body: z.object({
@@ -20,7 +21,7 @@ const userSignupZodSchema = z.object({
         required_error: "Last name is required",
       }),
     }),
-    address: z.string({
+    address: z.enum([...location] as [string, ...string[]], {
       required_error: "Address is required",
     }),
     budget: z.number({

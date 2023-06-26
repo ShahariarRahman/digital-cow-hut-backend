@@ -18,7 +18,6 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
     new ApiError(httpStatus.NOT_FOUND, "Cow not found or Cow has been Sold")
   );
 
-  // buyer has enough money
   if (buyer.budget >= cow.price) {
     const session = await mongoose.startSession();
     session.startTransaction();

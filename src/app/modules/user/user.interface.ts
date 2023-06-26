@@ -1,4 +1,5 @@
 import { Model } from "mongoose";
+import { ILocation } from "../cow/cow.interfaces";
 
 type IUserRole = "seller" | "buyer";
 
@@ -12,7 +13,7 @@ export type IUser = {
   role: IUserRole;
   name: IName;
   phoneNumber: string;
-  address: string;
+  address: ILocation;
   budget: number;
   income: number;
 };

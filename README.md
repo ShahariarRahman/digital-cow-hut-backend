@@ -8,17 +8,17 @@
 
 - api/v1/auth/signup (POST)
 - api/v1/users (GET)
-- api/v1/users/64925ebc7abf45bc789d10c2 (GET)
-- api/v1/users/64925ebc7abf45bc789d10c2 (PATCH)
-- api/v1/users/64925ebc7abf45bc789d10c2 (DELETE)
+- api/v1/users/64994185e6fa9978d7a7572d (GET)
+- api/v1/users/64994185e6fa9978d7a7572d (PATCH)
+- api/v1/users/64994185e6fa9978d7a7572d (DELETE)
 
 #### Cows :
 
 - api/v1/cows (POST)
 - api/v1/cows (GET)
-- api/v1/cows/6493915f6b4c15647b4b09c1
-- api/v1/cows/6493915f6b4c15647b4b09c1
-- api/v1/cows/6493915f6b4c15647b4b09c1
+- api/v1/cows/64994a3563250aec7641be13
+- api/v1/cows/64994a3563250aec7641be13
+- api/v1/cows/64994a3563250aec7641be13
 
 ### Pagination and Filtering routes of Cows
 
@@ -49,18 +49,20 @@ Body :
 
 ```
 {
- "password":"abcd1234",
- "role": "buyer",
+  "password": "12345",
+  "role": "buyer",
   "name": {
-    "firstName": "Md. Rakib",
-     "lastName": "Khan"
+      "firstName": "Md. Sakib",
+      "lastName": "Khan"
   },
- "phoneNumber":"01812345678",
- "address": "Dhaka",
- "budget":100000,
- "income":0
+  "phoneNumber": "01815123456",
+  "address": "Dhaka",
+  "budget": 200000,
+  "income": 0
 }
 ```
+
+<small>Role : `seller | buyer`</small><br/> <small>Location : `Dhaka | Chattogram | Barishal | Rajshahi | Sylhet | Comilla | Rangpur | Mymensingh`</small>
 
 **Get All Users : (GET)**
 
@@ -68,24 +70,24 @@ Body :
 
 **Get Single User : (GET)**
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64925ebc7abf45bc789d10c2`
+`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
 
 **Delete A User : (DELETE)**
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64925ebc7abf45bc789d10c2`
+`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
 
 **Update A User : (UPDATE)**
 
-`https://digi-cow-hut.vercel.app/api/v1/users/64925ebc7abf45bc789d10c2`
+`https://digi-cow-hut.vercel.app/api/v1/users/64994185e6fa9978d7a7572d`
 
 Body :
 
 ```
 {
   "name": {
-    "firstName": "Md. Rakibul",
+    "firstName": "Md. Rakibul"
   },
- "budget":150000,
+ "budget":250000
 }
 ```
 
@@ -101,17 +103,25 @@ Example Body :
 
 ```
 {
-  "name": "Sultan",
+  "name": "Shah Jahan",
   "age": 3,
-  "price": 50000,
+  "price": 77000,
   "location": "Mymensingh",
   "breed": "Kankrej",
   "weight": 300,
   "label": "for sale",
   "category": "Beef",
-  "seller": "64925ebc7abf45bc789d10c2"
+  "seller": "64994185e6fa9978d7a7572d"
 }
 ```
+
+<small>Location : `Dhaka | Chattogram | Barishal | Rajshahi | Sylhet | Comilla | Rangpur | Mymensingh`</small>
+
+<small>Breed : `Brahman | Nellore | Sahiwal | Gir | Indigenous | Tharparkar | Kankrej`</small><br/>
+
+<small>Label : `for sale | sold out`</small><br/>
+
+<small>Category : `Dairy | Beef | DualPurpose`</small><br/><br/>
 
 **Get All Cows : (GET)**
 
@@ -120,7 +130,7 @@ Example Body :
 Pagination :
 
 ```
-https://digi-cow-hut.vercel.app/api/v1/cows?searchTerm=dai&page=1&limit=1&sortBy=price&sortOrder=asc&minPrice=5000&maxPrice=5000&location=Mymensingh
+cows?searchTerm=Kankrej&page=1&limit=3&sortBy=price&sortOrder=asc&minPrice=60000&maxPrice=80000&location=Chattogram
 
 https://digi-cow-hut.vercel.app/api/v1/cows?page=1&limit=5
 
@@ -128,31 +138,31 @@ https://digi-cow-hut.vercel.app/api/v1/cows?searchTerm=dai
 
 https://digi-cow-hut.vercel.app/api/v1/cows?sortBy=price&sortOrder=asc
 
-https://digi-cow-hut.vercel.app/api/v1/cows?minPrice=5000&maxPrice=20000
+https://digi-cow-hut.vercel.app/api/v1/cows?minPrice=60000&maxPrice=80000
 
-https://digi-cow-hut.vercel.app/api/v1/cows?location=Mymensingh
+https://digi-cow-hut.vercel.app/api/v1/cows?location=Chattogram
 
 ```
 
 **Get Single Cow : (GET)**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/6493915f6b4c15647b4b09c1`
+`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
 
 **Delete A Cow : (DELETE)**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/6493915f6b4c15647b4b09c1`
+`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
 
 **Update A Cow : (UPDATE)**
 
-`https://digi-cow-hut.vercel.app/api/v1/cows/6493915f6b4c15647b4b09c1`
+`https://digi-cow-hut.vercel.app/api/v1/cows/64994a3563250aec7641be13`
 
 Example Body :
 
 ```
 {
   "age": 4,
-  "price": 55000,
-  "weight": 310,
+  "price": 75000,
+  "weight": 270,
 }
 ```
 
@@ -170,8 +180,8 @@ Example Body :
 
 ```
 {
-  "cow": "6493915f6b4c15647b4b09c1",
-  "buyer": "6494cea3e58faac9231a7497"
+  "cow": "64994a3563250aec7641be13",
+  "buyer": "649943b0810ac783b4b1f444"
 }
 ```
 
