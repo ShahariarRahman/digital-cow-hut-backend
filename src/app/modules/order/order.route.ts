@@ -5,7 +5,7 @@ import { OrderValidation } from "./order.validation";
 
 const router = express.Router();
 
-// router.get("/", OrderController.getAllOrders);
+router.get("/", OrderController.getAllOrders);
 
 router.post(
   "/",
