@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 
-type IUserRole = "seller" | " buyer";
+type IUserRole = "seller" | "buyer";
 
 type IName = {
   firstName: string;

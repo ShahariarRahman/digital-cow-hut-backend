@@ -11,19 +11,61 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
   if (!buyer) {
     throw new ApiError(404, "Buyer not found");
   }
+  if (buyer.role !== "buyer") {
+    throw new ApiError(404, "User is not Buyer");
+  }
 
   const cow = await Cow.findById(order.cow);
   if (!cow) {
     throw new ApiError(404, "Cow not found");
   }
 
+  // If the user has enough money
   if (buyer.budget >= cow.price) {
     const session = await mongoose.startSession();
     try {
       session.startTransaction();
+
+      // Seller budget addition
+      const seller = await User.findById(cow.seller);
+      if (!seller) {
+        throw new ApiError(404, "Seller not found");
+      }
+
+      const sellerNewBudget = Number(seller.budget) + Number(cow.price);
+
+      const sellerUpdateDoc = {
+        budget: sellerNewBudget,
+      };
+
+      const sellerUpdate = await User.findByIdAndUpdate(
+        seller._id,
+        sellerUpdateDoc,
+        { session }
+      );
+
+      if (!sellerUpdate) {
+        throw new ApiError(404, "Failed to update seller");
+      }
+
+      // Buyer budget deduction
+      const buyerNewBudget = Number(buyer.budget) - Number(cow.price);
+
+      const buyerUpdateDoc = {
+        budget: buyerNewBudget,
+      };
+      const buyerUpdate = await User.findByIdAndUpdate(
+        buyer._id,
+        buyerUpdateDoc,
+        { session }
+      );
+      if (!buyerUpdate) {
+        throw new ApiError(404, "Failed to update seller");
+      }
+
       // cow sold out
-      const updateDoc = { label: "sold out" };
-      const cowLevel = await Cow.findByIdAndUpdate(cow._id, updateDoc, {
+      const cowUpdateDoc = { label: "sold out" };
+      const cowLevel = await Cow.findByIdAndUpdate(cow._id, cowUpdateDoc, {
         session,
       });
 
@@ -38,7 +80,12 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
       await session.endSession();
 
       const populatedOrder = await Order.findById(newOrder._id)
-        .populate("cow")
+        .populate({
+          path: "cow",
+          populate: {
+            path: "seller",
+          },
+        })
         .populate("buyer");
 
       return populatedOrder;
