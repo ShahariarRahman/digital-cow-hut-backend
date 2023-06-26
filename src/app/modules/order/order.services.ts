@@ -7,71 +7,42 @@ import { Cow } from "../cow/cow.model";
 import mongoose from "mongoose";
 
 const createOrder = async (order: IOrder): Promise<IOrder | null> => {
-  const buyer = await User.findById(order.buyer);
-  if (!buyer) {
-    throw new ApiError(404, "Buyer not found");
-  }
-  if (buyer.role !== "buyer") {
-    throw new ApiError(404, "User is not Buyer");
-  }
+  const buyer = await User.findOne({ _id: order.buyer, role: "buyer" }).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Buyer not found or User is not a buyer")
+  );
 
-  const cow = await Cow.findById(order.cow);
-  if (!cow) {
-    throw new ApiError(404, "Cow not found");
-  }
+  const cow = await Cow.findOne({
+    _id: order.cow,
+    label: { $ne: "sold out" },
+  }).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Cow not found or has been sold")
+  );
 
-  // If the user has enough money
+  // buyer has enough money
   if (buyer.budget >= cow.price) {
     const session = await mongoose.startSession();
+    session.startTransaction();
     try {
-      session.startTransaction();
-
-      // Seller budget addition
-      const seller = await User.findById(cow.seller);
-      if (!seller) {
-        throw new ApiError(404, "Seller not found");
-      }
-
-      const sellerNewBudget = Number(seller.budget) + Number(cow.price);
-
-      const sellerUpdateDoc = {
-        budget: sellerNewBudget,
-      };
-
-      const sellerUpdate = await User.findByIdAndUpdate(
-        seller._id,
-        sellerUpdateDoc,
-        { session }
-      );
-
-      if (!sellerUpdate) {
-        throw new ApiError(404, "Failed to update seller");
-      }
+      // Seller income addition
+      await User.findByIdAndUpdate(
+        cow.seller,
+        { $inc: { income: Number(cow.price) } },
+        { new: true, session }
+      ).orFail(new ApiError(httpStatus.NOT_FOUND, "Failed to update seller"));
 
       // Buyer budget deduction
-      const buyerNewBudget = Number(buyer.budget) - Number(cow.price);
-
-      const buyerUpdateDoc = {
-        budget: buyerNewBudget,
-      };
-      const buyerUpdate = await User.findByIdAndUpdate(
+      await User.findByIdAndUpdate(
         buyer._id,
-        buyerUpdateDoc,
-        { session }
-      );
-      if (!buyerUpdate) {
-        throw new ApiError(404, "Failed to update seller");
-      }
+        { $inc: { budget: -Number(cow.price) } },
+        { new: true, session }
+      ).orFail(new ApiError(httpStatus.NOT_FOUND, "Failed to update buyer"));
 
       // cow sold out
-      const cowUpdateDoc = { label: "sold out" };
-      const cowLevel = await Cow.findByIdAndUpdate(cow._id, cowUpdateDoc, {
-        session,
-      });
-
-      if (!cowLevel) {
-        throw new ApiError(404, "Failed to update cow label");
-      }
+      await Cow.findByIdAndUpdate(
+        cow._id,
+        { label: "sold out" },
+        { new: true, session }
+      ).orFail(new ApiError(httpStatus.NOT_FOUND, "Failed to update cow"));
 
       // create order
       const newOrder = await Order.create(order);
