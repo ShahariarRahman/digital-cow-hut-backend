@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { userRole } from "./user.constant";
-import { location } from "../cow/cow.constants";
 
 const updateUserZodSchema = z.object({
   body: z.object({
@@ -13,12 +12,27 @@ const updateUserZodSchema = z.object({
         lastName: z.string().optional(),
       })
       .optional(),
-    address: z.enum([...location] as [string, ...string[]]).optional(),
+    address: z.string().optional(),
     budget: z.number().optional(),
     income: z.number().optional(),
   }),
 });
 
+const updateProfileZodSchema = z.object({
+  body: z.object({
+    password: z.string().optional(),
+    name: z
+      .object({
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+      })
+      .optional(),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
+  }),
+});
+
 export const UserValidation = {
   updateUserZodSchema,
+  updateProfileZodSchema,
 };

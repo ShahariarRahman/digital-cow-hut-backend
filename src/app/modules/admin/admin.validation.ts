@@ -1,12 +1,11 @@
 import { z } from "zod";
-import { userRole } from "../user/user.constant";
 
-const userSignupZodSchema = z.object({
+const createAdminZodSchema = z.object({
   body: z.object({
     phoneNumber: z.string({
       required_error: "Phone Number is required",
     }),
-    role: z.enum([...userRole] as [string, ...string[]], {
+    role: z.enum(["admin"], {
       required_error: "Role is required",
     }),
     password: z.string({
@@ -23,16 +22,10 @@ const userSignupZodSchema = z.object({
     address: z.string({
       required_error: "Address is required",
     }),
-    budget: z.number({
-      required_error: "Budget is required",
-    }),
-    income: z.number({
-      required_error: "Income is required",
-    }),
   }),
 });
 
-const userLoginZodSchema = z.object({
+const loginAdminZodSchema = z.object({
   body: z.object({
     phoneNumber: z.string({
       required_error: "Phone Number is required",
@@ -43,16 +36,7 @@ const userLoginZodSchema = z.object({
   }),
 });
 
-const refreshTokenZodSchema = z.object({
-  cookies: z.object({
-    refreshToken: z.string({
-      required_error: "Refresh Token is required",
-    }),
-  }),
-});
-
-export const AuthValidation = {
-  userSignupZodSchema,
-  userLoginZodSchema,
-  refreshTokenZodSchema,
+export const AdminValidation = {
+  createAdminZodSchema,
+  loginAdminZodSchema,
 };

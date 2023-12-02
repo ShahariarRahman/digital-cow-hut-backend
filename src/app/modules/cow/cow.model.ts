@@ -1,11 +1,8 @@
-import { Schema, UpdateQuery, model } from "mongoose";
+import { Schema, model } from "mongoose";
 import { CowModel, ICow } from "./cow.interfaces";
 import { breed, category, label, location } from "./cow.constants";
-import httpStatus from "http-status";
-import ApiError from "../../../errors/ApiError";
-import { User } from "../user/user.model";
 
-const CowSchema = new Schema<ICow, CowModel>(
+const cowSchema = new Schema<ICow, CowModel>(
   {
     name: {
       type: String,
@@ -57,31 +54,41 @@ const CowSchema = new Schema<ICow, CowModel>(
   }
 );
 
-CowSchema.pre("findOneAndUpdate", async function (next) {
-  const updateQuery = this.getUpdate() as UpdateQuery<Partial<ICow | null>>;
-  if (!updateQuery.seller) {
-    next();
-  } else {
-    const userData = await User.findById(updateQuery.seller);
-    if (!userData) {
-      throw new ApiError(httpStatus.NOT_FOUND, "Seller not found !");
-    } else if (userData.role !== "seller") {
-      throw new ApiError(httpStatus.NOT_FOUND, "User is not a seller");
-    } else {
-      next();
-    }
-  }
-});
+// validate seller of cow
+cowSchema.statics.isSellerValid = async function (
+  cowId: string,
+  sellerId: string
+): Promise<ICow | null> {
+  return await this.exists({ _id: cowId, seller: sellerId }).lean();
+};
 
-CowSchema.pre("save", async function (next) {
-  const userData = await User.findById(this.seller);
-  if (!userData) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Seller is not found");
-  } else if (userData.role !== "seller") {
-    throw new ApiError(httpStatus.NOT_FOUND, "User is not a Seller");
-  } else {
-    next();
-  }
-});
+// // if seller update? check if valid or not
+// cowSchema.pre("findOneAndUpdate", async function (next) {
+//   const updateQuery = this.getUpdate() as UpdateQuery<Partial<ICow | null>>;
+//   if (!updateQuery.seller) {
+//     next(); // no seller _id, so no update.
+//   } else {
+//     const userData = await User.findById(updateQuery.seller);
+//     if (!userData) {
+//       throw new ApiError(httpStatus.NOT_FOUND, "Seller not found !");
+//     } else if (userData.role !== "seller") {
+//       throw new ApiError(httpStatus.NOT_FOUND, "User is not a seller");
+//     } else {
+//       next();
+//     }
+//   }
+// });
 
-export const Cow = model<ICow, CowModel>("Cow", CowSchema);
+// // if seller exist in user model & role === seller
+// cowSchema.pre("save", async function (next) {
+//   const userData = await User.findById(this.seller);
+//   if (!userData) {
+//     throw new ApiError(httpStatus.NOT_FOUND, "Seller is not found");
+//   } else if (userData.role !== "seller") {
+//     throw new ApiError(httpStatus.NOT_FOUND, "User is not a Seller");
+//   } else {
+//     next();
+//   }
+// });
+
+export const Cow = model<ICow, CowModel>("Cow", cowSchema);

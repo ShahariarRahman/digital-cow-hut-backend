@@ -1,0 +1,22 @@
+[
+  {
+    "password": "1234",
+    "role": "admin",
+    "name": {
+      "firstName": "Md. Admin 1",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "01911111111",
+    "address": "Dhaka"
+  },
+  {
+    "password": "1234",
+    "role": "admin",
+    "name": {
+      "firstName": "Md. Admin 2",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "01911111112",
+    "address": "Khulna"
+  }
+]

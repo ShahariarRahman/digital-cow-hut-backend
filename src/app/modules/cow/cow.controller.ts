@@ -7,10 +7,13 @@ import { ICow } from "./cow.interfaces";
 import pick from "../../../shared/pick";
 import { paginationFields } from "../../../constants/pagination";
 import { cowFilterableFields } from "./cow.constants";
+import { JwtPayload } from "jsonwebtoken";
 
+// create a cow
 const createCow = catchAsync(async (req: Request, res: Response) => {
+  const userAuthData = req.user as JwtPayload;
   const { ...data } = req.body;
-  const result = await CowService.createCow(data);
+  const result = await CowService.createCow(userAuthData, data);
 
   sendResponse<ICow>(res, {
     success: true,
@@ -20,6 +23,7 @@ const createCow = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get all cows
 const getAllCows = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, cowFilterableFields);
   const paginationOptions = pick(req.query, paginationFields);
@@ -35,9 +39,9 @@ const getAllCows = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// get single cow
 const getSingleCow = catchAsync(async (req: Request, res: Response) => {
   const id = req.params.id;
-
   const result = await CowService.getSingleCow(id);
 
   sendResponse<ICow>(res, {
@@ -48,11 +52,13 @@ const getSingleCow = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// update a cow
 const updateCow = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
+  const userAuthData = req.user as JwtPayload;
+  const cowId = req.params.id;
   const updatedData = req.body;
 
-  const result = await CowService.updateCow(id, updatedData);
+  const result = await CowService.updateCow(userAuthData, cowId, updatedData);
 
   sendResponse<ICow>(res, {
     success: true,
@@ -62,10 +68,11 @@ const updateCow = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+// delete a cow
 const deleteCow = catchAsync(async (req: Request, res: Response) => {
+  const userAuthData = req.user as JwtPayload;
   const id = req.params.id;
-
-  const result = await CowService.deleteCow(id);
+  const result = await CowService.deleteCow(userAuthData, id);
 
   sendResponse<ICow>(res, {
     success: true,

@@ -1,0 +1,62 @@
+[
+  {
+    "password": "1234",
+    "role": "buyer",
+    "name": {
+      "firstName": "Md. Buyer 1",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "0161111111",
+    "address": "Dhaka",
+    "budget": 270000,
+    "income": 0
+  },
+  {
+    "password": "1234",
+    "role": "buyer",
+    "name": {
+      "firstName": "Md. Buyer 2",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "0161111112",
+    "address": "Chattogram",
+    "budget": 270000,
+    "income": 0
+  },
+  {
+    "password": "1234",
+    "role": "buyer",
+    "name": {
+      "firstName": "Md. Buyer 3",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "0161111113",
+    "address": "Khulna",
+    "budget": 270000,
+    "income": 0
+  },
+  {
+    "password": "1234",
+    "role": "buyer",
+    "name": {
+      "firstName": "Md. Buyer 4",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "0161111114",
+    "address": "Sylhet",
+    "budget": 270000,
+    "income": 0
+  },
+  {
+    "password": "1234",
+    "role": "buyer",
+    "name": {
+      "firstName": "Md. Buyer 5",
+      "lastName": "Khan"
+    },
+    "phoneNumber": "0161111115",
+    "address": "Mymensingh",
+    "budget": 270000,
+    "income": 0
+  }
+]

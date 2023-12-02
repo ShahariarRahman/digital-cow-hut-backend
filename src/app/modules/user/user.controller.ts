@@ -4,6 +4,8 @@ import catchAsync from "../../../shared/catchAsync";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
 import { IUser } from "./user.interface";
+import { IAdmin } from "../admin/admin.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 const getAllUsers = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.getAllUsers();
@@ -55,9 +57,38 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const userAuthData = req.user as JwtPayload;
+
+  const result = await UserService.getUserProfile(userAuthData);
+
+  sendResponse<IUser | IAdmin>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User's information retrieved successfully",
+    data: result,
+  });
+});
+
+const updateUserProfile = catchAsync(async (req: Request, res: Response) => {
+  const userAuthData = req.user as JwtPayload;
+  const updatedData = req.body;
+
+  const result = await UserService.updateUserProfile(userAuthData, updatedData);
+
+  sendResponse<IUser | IAdmin>(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "User's information retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
+  getUserProfile,
+  updateUserProfile,
 };

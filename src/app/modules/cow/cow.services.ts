@@ -7,15 +7,26 @@ import { IGenericResponse } from "../../../interfaces/common";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { cowSearchableFields } from "./cow.constants";
 import { SortOrder } from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
 
-const createCow = async (payload: ICow): Promise<ICow | undefined> => {
+// create a cow
+const createCow = async (user: JwtPayload, payload: ICow): Promise<ICow> => {
+  if (payload.seller !== user._id) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Seller Field will be your user id : ${user._id}`
+    );
+  }
+
   const newCow = (await Cow.create(payload)).populate("seller");
+
   if (!newCow) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create cow");
   }
   return newCow;
 };
 
+// get all cows
 const getAllCows = async (
   filters: ICowFilters,
   paginationOptions: IPaginationOptions
@@ -78,23 +89,45 @@ const getAllCows = async (
   };
 };
 
-const getSingleCow = async (id: string): Promise<ICow | null> => {
+// get single cow
+const getSingleCow = async (id: string): Promise<ICow> => {
   const result = await Cow.findById(id)
     .populate("seller")
     .orFail(new ApiError(httpStatus.NOT_FOUND, "Cow not found"));
   return result;
 };
 
+// update a cow
 const updateCow = async (
+  user: JwtPayload,
   id: string,
   payload: Partial<ICow>
 ): Promise<ICow | null> => {
-  await Cow.findById(id).orFail(
+  await Cow.exists({ _id: id }).orFail(
     new ApiError(httpStatus.NOT_FOUND, "Cow not found")
   );
 
+  // Only the specific seller of the cow can update
+  const isSellerValid = await Cow.isSellerValid(id, user._id);
+  if (!isSellerValid) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Can only be accessed by the seller of the cow"
+    );
+  }
+
+  // No data from client-side
   if (Object.keys(payload).length < 1) {
     throw new Error("No data found to update");
+  }
+
+  // if seller field updates?
+  // seller field === logged in seller id
+  if (payload.seller && payload.seller !== user._id) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Seller Field will be your user id : ${user._id}`
+    );
   }
 
   const result = await Cow.findOneAndUpdate({ _id: id }, payload, {
@@ -106,7 +139,25 @@ const updateCow = async (
   return result;
 };
 
-const deleteCow = async (id: string): Promise<ICow | null> => {
+// delete a cow
+const deleteCow = async (
+  user: JwtPayload,
+  id: string
+): Promise<ICow | null> => {
+  await Cow.exists({ _id: id }).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "No cow found to delete")
+  );
+
+  // Only the specific seller of the cow can delete
+  const isSellerValid = await Cow.isSellerValid(id, user._id);
+
+  if (!isSellerValid) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Can only be accessed by the seller of the cow"
+    );
+  }
+
   const result = await Cow.findByIdAndDelete(id).orFail(
     new ApiError(httpStatus.NOT_FOUND, "Failed to Delete")
   );

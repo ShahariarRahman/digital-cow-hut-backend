@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
 import { IOrder } from "./order.interfaces";
@@ -5,10 +6,23 @@ import { Order } from "./order.model";
 import { User } from "../user/user.model";
 import { Cow } from "../cow/cow.model";
 import mongoose from "mongoose";
+import { ENUM_USER_ROLE } from "../../../enums/user";
+import { JwtPayload } from "jsonwebtoken";
 
-const createOrder = async (order: IOrder): Promise<IOrder | null> => {
-  const buyer = await User.findOne({ _id: order.buyer, role: "buyer" }).orFail(
-    new ApiError(httpStatus.NOT_FOUND, "Buyer not found or User is not a buyer")
+// create order
+const createOrder = async (
+  user: JwtPayload,
+  order: IOrder
+): Promise<IOrder | null> => {
+  if (order.buyer !== user._id) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Buyer Field will be your user id : ${user._id}`
+    );
+  }
+
+  const buyer = await User.findById(order.buyer).orFail(
+    new ApiError(httpStatus.NOT_FOUND, "Buyer not found")
   );
 
   const cow = await Cow.findOne({
@@ -44,12 +58,12 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
       ).orFail(new ApiError(httpStatus.NOT_FOUND, "Failed to update cow"));
 
       // create order
-      const newOrder = await Order.create(order);
+      const newOrder = await Order.create([order], { session });
 
       await session.commitTransaction();
       await session.endSession();
 
-      const populatedOrder = await Order.findById(newOrder._id)
+      const populatedOrder = await Order.findById(newOrder[0]._id)
         .populate({
           path: "cow",
           populate: {
@@ -68,15 +82,118 @@ const createOrder = async (order: IOrder): Promise<IOrder | null> => {
   }
 };
 
-const getAllOrders = async (): Promise<IOrder[] | null> => {
-  const orders = await Order.find().populate("cow").populate("buyer");
-  if (!orders) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Failed to retrieve Orders");
+// get specific orders
+const getAllOrders = async (userAuthData: JwtPayload): Promise<IOrder[]> => {
+  const { _id, role } = userAuthData;
+
+  const query: any = {};
+
+  // field filtering: in populated data with match: if no match, cow = null
+  const populatePaths = [
+    { path: "buyer" },
+    {
+      path: "cow",
+      match: role === ENUM_USER_ROLE.SELLER ? { seller: _id } : undefined,
+      populate: {
+        path: "seller",
+      },
+    },
+  ];
+
+  // buyer: add field filter
+  // admin | seller: do nothing: query= {};
+  // !buyer | !admin | !seller: throw error
+  if (role === ENUM_USER_ROLE.BUYER) {
+    query.buyer = _id; // field filtering
+  } else if (role !== ENUM_USER_ROLE.ADMIN && role !== ENUM_USER_ROLE.SELLER) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "User must be Admin | Buyer | Seller"
+    );
   }
+
+  let orders = await Order.find(query)
+    .lean()
+    .populate(populatePaths)
+    .orFail(
+      new ApiError(
+        httpStatus.UNAUTHORIZED,
+        "Failed / invalid access. buyer/ seller can only access orders related to them. Admin access all."
+      )
+    );
+
+  // seller & push the order.cow !== null
+  if (role === ENUM_USER_ROLE.SELLER) {
+    orders = orders.filter(order => order.cow !== null);
+  }
+
+  // empty means this user have no access of any orders
+  if (!orders.length) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "This seller's cows have not been ordered yet"
+    );
+  }
+
   return orders;
+};
+
+// get specific single order
+const getSingleOrder = async (
+  userAuthData: JwtPayload,
+  orderId: string
+): Promise<IOrder | null> => {
+  const { _id, role } = userAuthData;
+
+  const query: any = { _id: orderId };
+
+  // field filtering: in populated data with match: if no match cow = null
+  const populatePaths = [
+    { path: "buyer" },
+    {
+      path: "cow",
+      match: role === ENUM_USER_ROLE.SELLER ? { seller: _id } : undefined,
+      populate: {
+        path: "seller",
+      },
+    },
+  ];
+
+  // buyer: add field filter
+  // admin | seller: do nothing: { _id: orderId };
+  // !buyer | !admin | !seller: throw error
+  if (role === ENUM_USER_ROLE.BUYER) {
+    query.buyer = _id; // field filtering
+  } else if (role !== ENUM_USER_ROLE.ADMIN && role !== ENUM_USER_ROLE.SELLER) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "User must be Admin | Buyer | Seller"
+    );
+  }
+
+  const order = await Order.findOne(query)
+    .lean()
+    .populate(populatePaths)
+    .orFail(
+      new ApiError(
+        httpStatus.NOT_FOUND,
+        "Failed / invalid access. buyer/ seller can only access order related to them. Admin access all."
+      )
+    );
+
+  // seller & order.cow === null
+  if (role === ENUM_USER_ROLE.SELLER && !order.cow) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "Seller only have access to order of own cow."
+    );
+  }
+
+  return order;
 };
 
 export const OrderService = {
   createOrder,
   getAllOrders,
+  getSingleOrder,
 };

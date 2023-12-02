@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Model, Types } from "mongoose";
 import { IUser } from "../user/user.interface";
 
@@ -36,7 +37,9 @@ export type ICow = {
   seller: Types.ObjectId | IUser;
 };
 
-export type CowModel = Model<ICow, Record<string, unknown>>;
+export type CowModel = {
+  isSellerValid(cowId: string, sellerId: string): Promise<ICow | null>;
+} & Model<ICow>;
 
 export type ICowFilters = {
   minPrice?: number;
